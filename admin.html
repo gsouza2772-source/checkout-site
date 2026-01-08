@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Painel Admin ⚙️</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{box-sizing:border-box}
+body{
+  font-family:Arial, sans-serif;
+  background:linear-gradient(135deg,#eef2f7,#e6ebf2);
+  margin:0; min-height:100vh;
+  display:flex; justify-content:center; align-items:center;
+}
+.app{
+  background:#fff;
+  width:100%; max-width:430px;
+  border-radius:20px;
+  box-shadow:0 25px 50px rgba(0,0,0,.12);
+  overflow:hidden;
+}
+.tabs{
+  display:flex;
+}
+.tabs button{
+  flex:1;
+  padding:14px;
+  border:none;
+  cursor:pointer;
+  background:#f1f3f7;
+  font-size:15px;
+}
+.tabs button.active{
+  background:#3483fa;
+  color:#fff;
+}
+.page{
+  display:none;
+  padding:22px;
+}
+.page.active{display:block}
+h2{text-align:center;margin-top:0}
+input, textarea{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
+button.save{
+  width:100%;
+  padding:14px;
+  margin-top:16px;
+  border:none;
+  border-radius:12px;
+  background:#3483fa;
+  color:#fff;
+  font-size:16px;
+}
+.item{
+  border:1px solid #ddd;
+  border-radius:12px;
+  padding:12px;
+  margin-top:10px;
+  font-size:14px;
+}
+.small{
+  font-size:12px;
+  color:#777;
+  margin-top:6px;
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- ABAS -->
+  <div class="tabs">
+    <button class="active" onclick="show('config')">⚙️ Configurações</button>
+    <button onclick="show('orders')">📋 Pedidos</button>
+  </div>
+
+  <!-- CONFIGURAÇÕES -->
+  <div id="config" class="page active">
+    <h2>⚙️ Checkout</h2>
+
+    <input id="price" placeholder="Valor (ex: 99,90)">
+    <textarea id="desc" placeholder="Descrição do produto"></textarea>
+
+    <textarea id="pix" placeholder="Pix Copia e Cola"></textarea>
+    <textarea id="boleto" placeholder="Boleto Copia e Cola"></textarea>
+
+    <input id="parcelas" placeholder="Máx parcelas do cartão (ex: 12)">
+
+    <button class="save" onclick="salvar()">Salvar alterações</button>
+
+    <div class="small">
+      As alterações refletem automaticamente no checkout
+    </div>
+  </div>
+
+  <!-- PEDIDOS -->
+  <div id="orders" class="page">
+    <h2>📋 Pedidos</h2>
+
+    <div id="listaPedidos"></div>
+
+    <div class="small">
+      Lista local (para API real depois)
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ===== CONFIGURAÇÃO ===== */
+const defaultConfig = {
+  price:'99,90',
+  desc:'Produto digital premium',
+  pix:'PIX-EXEMPLO-123',
+  boleto:'BOLETO-EXEMPLO-456',
+  parcelas:12
+};
+
+const config = JSON.parse(localStorage.getItem('config')) || defaultConfig;
+
+price.value = config.price;
+desc.value = config.desc;
+pix.value = config.pix;
+boleto.value = config.boleto;
+parcelas.value = config.parcelas;
+
+function salvar(){
+  localStorage.setItem('config', JSON.stringify({
+    price: price.value,
+    desc: desc.value,
+    pix: pix.value,
+    boleto: boleto.value,
+    parcelas: parcelas.value
+  }));
+  alert('Configurações salvas!');
+}
+
+/* ===== PEDIDOS (LOCAL) ===== */
+const pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
+const lista = document.getElementById('listaPedidos');
+
+if(pedidos.length === 0){
+  lista.innerHTML = '<p style="text-align:center;color:#777">Nenhum pedido ainda</p>';
+} else {
+  pedidos.forEach(p => {
+    lista.innerHTML += `
+      <div class="item">
+        <strong>Pedido #${p.id}</strong><br>
+        Método: ${p.metodo}<br>
+        Valor: R$ ${p.valor}<br>
+        Status: ${p.status}
+      </div>
+    `;
+  });
+}
+
+/* ===== NAVEGAÇÃO ===== */
+function show(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+
+</body>
+</html>
