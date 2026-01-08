@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Finalizar Compra 🛍️</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{box-sizing:border-box}
+body{
+  font-family:Arial, sans-serif;
+  background:linear-gradient(135deg,#eef2f7,#e6ebf2);
+  margin:0;min-height:100vh;
+  display:flex;justify-content:center;align-items:center;
+}
+.app{
+  background:#fff;
+  width:100%;max-width:430px;
+  border-radius:20px;
+  box-shadow:0 25px 50px rgba(0,0,0,.12);
+  overflow:hidden;
+}
+.header{
+  padding:20px;
+  text-align:center;
+  border-bottom:1px solid #eee;
+}
+.price{
+  font-size:28px;
+  color:#3483fa;
+  margin-top:6px;
+}
+.page{display:none;padding:22px}
+.page.active{display:block}
+.option{
+  border:1px solid #ddd;
+  border-radius:14px;
+  padding:16px;
+  margin-top:14px;
+  display:flex;justify-content:space-between;
+  cursor:pointer;
+}
+.option:hover{border-color:#3483fa;background:#f4f8ff}
+button{
+  width:100%;
+  padding:14px;
+  margin-top:16px;
+  border:none;
+  border-radius:12px;
+  background:#3483fa;
+  color:#fff;
+  font-size:16px;
+}
+.back{
+  background:#eef3ff;
+  color:#3483fa;
+}
+.code{
+  background:#f7f9fc;
+  border:1px dashed #cfd8ff;
+  padding:14px;
+  border-radius:12px;
+  word-break:break-all;
+  font-size:13px;
+  margin-top:12px;
+}
+input,select{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
+.clock{
+  text-align:center;
+  font-size:42px;
+  margin:18px 0;
+}
+.secure{
+  text-align:center;
+  font-size:12px;
+  color:#777;
+  margin-top:12px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h2>🛍️ Finalizar Compra</h2>
+    <div class="price" id="price"></div>
+    <p id="desc" style="color:#555"></p>
+  </div>
+
+  <!-- TELA 1: MÉTODO -->
+  <div id="home" class="page active">
+    <div class="option" onclick="show('pixStart')">🔑 Pix <span>Imediato</span></div>
+    <div class="option" onclick="show('card')">💳 Cartão <span>Até 12x</span></div>
+    <div class="option" onclick="show('boletoStart')">🧾 Boleto <span>Copiar depois</span></div>
+    <div class="secure">🔒 Checkout seguro • Ambiente confiável</div>
+  </div>
+
+  <!-- PIX INICIAL -->
+  <div id="pixStart" class="page">
+    <h3>🔑 Pagamento via Pix</h3>
+    <p>Valor a pagar:</p>
+    <div class="price" id="pixPrice"></div>
+    <button onclick="show('pixCodePage')">Continuar</button>
+    <button class="back" onclick="show('home')">Voltar</button>
+  </div>
+
+  <!-- PIX CÓDIGO -->
+  <div id="pixCodePage" class="page">
+    <h3>📋 Pix Copia e Cola</h3>
+    <div class="code" id="pixCode"></div>
+    <button onclick="copy('pixCode')">Copiar Pix</button>
+    <div class="clock">⏳</div>
+    <p style="text-align:center">Aguardando confirmação do pagamento</p>
+    <button class="back" onclick="show('home')">Voltar</button>
+  </div>
+
+  <!-- BOLETO INICIAL -->
+  <div id="boletoStart" class="page">
+    <h3>🧾 Pagamento via Boleto</h3>
+    <p>Valor a pagar:</p>
+    <div class="price" id="boletoPrice"></div>
+    <button onclick="show('boletoCodePage')">Continuar</button>
+    <button class="back" onclick="show('home')">Voltar</button>
+  </div>
+
+  <!-- BOLETO CÓDIGO -->
+  <div id="boletoCodePage" class="page">
+    <h3>📋 Código do Boleto</h3>
+    <div class="code" id="boletoCode"></div>
+    <button onclick="copy('boletoCode')">Copiar Boleto</button>
+    <div class="clock">⏳</div>
+    <p style="text-align:center">Pagamento pode levar até 2 dias úteis</p>
+    <button class="back" onclick="show('home')">Voltar</button>
+  </div>
+
+  <!-- CARTÃO -->
+  <div id="card" class="page">
+    <h3>💳 Pagamento com Cartão</h3>
+    <input placeholder="Nome do titular">
+    <input placeholder="Número do cartão">
+    <input placeholder="Validade MM/AA">
+    <select id="parcelas"></select>
+    <button onclick="show('cardConfirm')">Confirmar Pagamento</button>
+    <button class="back" onclick="show('home')">Voltar</button>
+  </div>
+
+  <!-- CARTÃO CONFIRMAÇÃO -->
+  <div id="cardConfirm" class="page">
+    <div class="clock">⏳</div>
+    <h3 style="text-align:center">Processando pagamento</h3>
+    <p style="text-align:center">Aguarde a confirmação</p>
+    <button class="back" onclick="show('home')">Voltar</button>
+  </div>
+
+</div>
+
+<script>
+const config = JSON.parse(localStorage.getItem('config')) || {
+  price:'99,90',
+  desc:'Produto digital premium',
+  pix:'PIX-EXEMPLO-123',
+  boleto:'BOLETO-EXEMPLO-456',
+  parcelas:12
+};
+
+price.innerText = 'R$ ' + config.price;
+pixPrice.innerText = 'R$ ' + config.price;
+boletoPrice.innerText = 'R$ ' + config.price;
+desc.innerText = config.desc;
+pixCode.innerText = config.pix;
+boletoCode.innerText = config.boleto;
+
+// Parcelas
+for(let i=1;i<=config.parcelas;i++){
+  parcelas.innerHTML += `<option>${i}x</option>`;
+}
+
+function show(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function copy(id){
+  navigator.clipboard.writeText(document.getElementById(id).innerText);
+  alert('Copiado!');
+}
+</script>
+
+</body>
+      </html>
